@@ -1,0 +1,301 @@
+---
+title: Did the Best Denver Broncos Team Actually Win a Super Bowl?
+author: Dylan Bayles
+date: '2022-04-01'
+slug: did-the-best-broncos-team-actually-win-a-super-bowl
+categories: []
+tags: []
+---
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+# this stuff won't appear on the page - still functions the same
+
+library(tidyverse)
+library(ggrepel)
+library(gt)
+
+```
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+offense1990 <- read_csv("1990.csv") %>%
+  mutate(Season = "1990")
+offense1991 <- read_csv("1991.csv") %>%
+  mutate(Season = "1991")
+offense1992 <- read_csv("1992.csv") %>%
+  mutate(Season = "1992")
+offense1993 <- read_csv("1993.csv") %>%
+  mutate(Season = "1993")
+offense1994 <- read_csv("1994.csv") %>%
+  mutate(Season = "1994")
+offense1995 <- read_csv("1995.csv") %>%
+  mutate(Season = "1995")
+offense1996 <- read_csv("1996.csv") %>%
+  mutate(Season = "1996")
+offense1997 <- read_csv("1997.csv") %>%
+  mutate(Season = "1997")
+offense1998 <- read_csv("1998.csv") %>%
+  mutate(Season = "1998")
+offense1999 <- read_csv("1999.csv") %>%
+  mutate(Season = "1999")
+offense2000 <- read_csv("2000.csv") %>%
+  mutate(Season = "2000")
+offense2001 <- read_csv("2001.csv") %>%
+  mutate(Season = "2001")
+offense2002 <- read_csv("2002.csv") %>%
+  mutate(Season = "2002")
+offense2003 <- read_csv("2003.csv") %>%
+  mutate(Season = "2003")
+offense2004 <- read_csv("2004.csv") %>%
+  mutate(Season = "2004")
+offense2005 <- read_csv("2005.csv") %>%
+  mutate(Season = "2005")
+offense2006 <- read_csv("2006.csv") %>%
+  mutate(Season = "2006")
+offense2007 <- read_csv("2007.csv") %>%
+  mutate(Season = "2007")
+offense2008 <- read_csv("2008.csv") %>%
+  mutate(Season = "2008")
+offense2009 <- read_csv("2009.csv") %>%
+  mutate(Season = "2009")
+offense2010 <- read_csv("2010.csv") %>%
+  mutate(Season = "2010")
+offense2011 <- read_csv("2011.csv") %>%
+  mutate(Season = "2011")
+offense2012 <- read_csv("2012.csv") %>%
+  mutate(Season = "2012")
+offense2013 <- read_csv("2013.csv") %>%
+  mutate(Season = "2013")
+offense2014 <- read_csv("2014.csv") %>%
+  mutate(Season = "2014")
+offense2015 <- read_csv("2015.csv") %>%
+  mutate(Season = "2015")
+offense2016 <- read_csv("2016.csv") %>%
+  mutate(Season = "2016")
+offense2017 <- read_csv("2017.csv") %>%
+  mutate(Season = "2017")
+offense2018 <- read_csv("2018.csv") %>%
+  mutate(Season = "2018")
+offense2019 <- read_csv("2019.csv") %>%
+  mutate(Season = "2019")
+offense2020 <- read_csv("2020.csv") %>%
+  mutate(Season = "2020")
+offense2021 <- read_csv("2021.csv") %>%
+  mutate(Season = "2021")
+
+
+offense <- bind_rows(offense1990, offense1991, offense1992, offense1993, offense1994, offense1995, offense1996, offense1997, offense1998, offense1990, offense2000, offense2001, offense2002, offense2003, offense2004, offense2005, offense2006, offense2007, offense2008, offense2009, offense2010, offense2011, offense2012, offense2013, offense2014, offense2015, offense2016, offense2017, offense2018, offense2019, offense2020, offense2021)
+
+
+seasons <- read_csv("allseasonsdata.csv")
+
+defense1997 <- read_csv("defense_1997.xls.csv") %>%
+  mutate(Season = "1997")
+defense1998 <- read_csv("defense_1998.xls.csv") %>%
+  mutate(Season = "1998")
+defense2013 <- read_csv("defense_2013.csv") %>%
+  mutate(Season = "2013")
+defense2015 <- read_csv("defense_2015.csv") %>%
+  mutate(Season = "2015")
+
+
+defense <- bind_rows(defense1997, defense1998, defense2013, defense2015) %>%
+  filter(Tm == "Denver Broncos")
+```
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+zscores <- offense %>%
+  group_by(Season) %>%
+    mutate(
+      yardspergame = round((TotalYds / games), digits = 2),
+      pointspergame = round((TotalPoints / games), digits = 2),
+      turnoverspergame = TurnoversLost / games,
+      TotalTDS = RushingTD + PassingTD,
+      touchdownspergame = round((TotalTDS / games), digits = 2),
+      yardsZscore = as.numeric(scale(TotalYds, center = TRUE, scale = TRUE)),
+      pointsZscore = as.numeric(scale(TotalPoints, center = TRUE, scale = TRUE)),
+      turnoverZscore = as.numeric(scale(TurnoversLost, center = TRUE, scale = TRUE)) * -1,
+      yppZscore = as.numeric(scale(TotalYardsPerPlay, center = TRUE, scale = TRUE)),
+      touchdownZscore = as.numeric(scale(TotalTDS, center = TRUE, scale = TRUE)),
+      totalZscore = round((yardsZscore + pointsZscore + turnoverZscore + yppZscore + touchdownZscore), digits = 2)
+    ) %>% 
+  ungroup() %>%
+  filter(Team == "Denver Broncos") %>%
+  arrange(desc(totalZscore)) %>% 
+  select(Team, Season, totalZscore, yardspergame, pointspergame, touchdownspergame)
+```
+
+
+The Denver Broncos have been consistently bad over the last six seasons, in part due to hall of fame quarterback Peyton Manning retiring. However, they are still a highly decorated team, having won three Super Bowls (tied for 7th most) and having appeared in eight of them (tied for 3rd most). Many argue as to whether Manning or John Elway was the best Broncos quarterback of all time, but which team was the best?
+
+Denver won the Super Bowl in 1997, 1998, and 2015, but the 2013 team had a dominant offense that shattered single-season records and captured the AFC Championship title. However, they fell short to the Seattle Seahawks in Super Bowl XLVIII. 
+
+Could it potentially be that the Broncos' best team of all time never actually won a Super Bowl? Let's find out. For the sake of simplicity, we're going to focus only on the Denver Broncos teams from last season dating back to 1990, with a focus on the four teams within those years that reached the Super Bowl.
+
+First, let's look at the offense for each of these teams in the context of the times. How did they compare to the other offenses in the league during the year that they played? We'll use a Z-score to calculate this, which is a statistical measure of the distance from the mean.
+
+We will create Z-scores for several offensive statistics within each Denver team. We'll compare the total yards, total points, turnovers lost, yards per play, and total touchdowns. We'll then add all of the values together to get a total offensive Z-score, showing which teams were better than other teams in their respective years at gaining yards, scoring touchdowns, and not giving up the football.
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+zscores %>%
+  arrange(desc(totalZscore)) %>%
+   top_n(5, wt=totalZscore) %>% 
+  gt() %>%
+  cols_label(   
+    Team = "Team",
+    Season = "Season",
+    totalZscore = "Z-Score",
+    yardspergame = "Yards per game",
+    pointspergame = "Points per game",
+    touchdownspergame = "Touchdowns per game"
+    ) %>%
+  tab_header(
+    title = "The 2013 Denver Broncos Were Like Derrick Henry In High School",
+    subtitle = "That team excelled in every offensive category and were substantially better than all other offenses in the league that year"
+  ) %>%
+  tab_source_note(
+    source_note = md("**By:** Dylan Bayles | **Source:** Pro Football Reference")
+  ) %>%
+  tab_style(
+    style = cell_text(color = "black", weight = "bold", align = "left"),
+    locations = cells_title("title")
+  ) %>%
+  tab_style(
+    style = cell_text(color = "black", weight = "bold", align = "left"),
+    locations = cells_title("subtitle")
+  ) %>%
+  tab_style(
+    locations = cells_column_labels(columns = everything()),
+    style = list(
+      cell_borders(sides = "bottom", weight = px(3)),
+      cell_text(weight = "bold", size = 12)
+    )
+  ) %>%
+  opt_row_striping() %>%
+  opt_table_lines("none") %>% 
+  tab_style( 
+    style = list(
+      cell_fill(color = "#001489"),
+      cell_text(color = "white")
+    ),
+    locations = cells_body(
+      rows = Season == "2013"
+    )) %>%
+    tab_style( 
+    style = list(
+      cell_fill(color = "#FB4F14"),
+      cell_text(color = "white")
+    ),
+    locations = cells_body(
+      rows = Season == "1997" 
+    )) %>%
+    tab_style( 
+    style = list(
+      cell_fill(color = "#FB4F14"),
+      cell_text(color = "white")
+    ),
+    locations = cells_body(
+      rows = Season == "1998" 
+    )
+  )
+```
+
+The 2013 team had one of the most prolific offenses of all time, averaging 460 yards, 38 points, and four and a half touchdowns per game. It was miles ahead of the even the next closest Broncos team, having a Z-score nearly 3 points higher than the 1998 Super Bowl team.
+
+However, as we know very well, offense is only half of the ball game. Unlike the Big-12 Conference, if you want to win in the NFL you need to have some resemblance of a defense. Many argue that defense is even more important than offense, as it's easier to outscore an opponent who doesn't score anything, than it is to outscore an opponent in a shootout. Just ask Patrick Mahomes about his time at Texas Tech.
+
+The Simple Rating System takes a team's average point margin and adjusts it up or down based the team's strength of schedule. We will take the offensive and defensive simple ratings for all of Denver teams to show both how well both halves of the team performed.
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+superbowlseasons <- seasons %>%
+  filter(Year == 2015 | Year == 1998 | Year == 1997)
+
+otherseasons <- seasons %>%
+  filter(Year == 2013)
+
+```
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+
+ggplot() + 
+  geom_point(data=seasons, aes(x=OSRS, y=DSRS), color = "grey", cex = 4) + 
+  geom_point(data = superbowlseasons, aes(x=OSRS, y=DSRS), color = "orange", cex = 4) +
+  geom_point(data = otherseasons, aes(x=OSRS, y=DSRS), color = "blue", cex = 4) +
+  geom_vline(data=seasons, mapping=aes(xintercept=1.66875), color="black", label = "average") + 
+  geom_hline(data=seasons, mapping=aes(yintercept = 0.490625), color = "black", label = "average") +
+  geom_text_repel(data = superbowlseasons, aes(x=OSRS, y = DSRS, label = Year)) +
+  geom_text_repel(data = otherseasons, aes(x=OSRS, y = DSRS, label = Year)) +
+  geom_text(aes(x = 12, y = 1, label = "Average"), size = 3) +
+  geom_text(aes(x = 2.5, y = 6, label = "Average"), size = 3) +
+  geom_text(aes(x = -3, y = -6, label = "Bad offense, bad defense"), size = 3) + 
+  geom_text(aes(x = 11, y = 5, label = "Good offense, good defense"), size = 3) + 
+  labs(
+    x="Offensive Simple Rating", 
+    y="Defensive Simple Rating", 
+    title="You Need Offense and Defense For a Great Team", 
+    subtitle="The 1997 team was the only super bowl team to have both an above average offensive and defensive rating", 
+    caption="Source: Pro Football Reference | By Dylan Bayles"
+    ) +
+  theme_minimal() + 
+  theme(
+    plot.title = element_text(size = 20, face = "bold"),
+    axis.title = element_text(size = 8), 
+    plot.subtitle = element_text(size=10), 
+    panel.grid.minor = element_blank(),
+    plot.title.position = "plot"
+    ) 
+```
+
+The only team out of our four in question that made the good offense, good defense section was the 1997 team. The 2015 team had astonishing defense, but the offense was sub par thanks to Manning's neck being made of steel. The 1998 and 2013 teams had great offense, but the defense was not there to back it up. 
+
+Let's take one closer look at the defensive stats to make the final call. We'll look at the season rushing and passing yards of the opponents for our primary four contenders to see how many passing and rushing yards the defense was giving up.
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+
+defenseyards <- defense %>% pivot_longer(cols = ends_with("gYds"), names_to = "Type", values_to = "totalyards")
+
+ggplot() + 
+  geom_bar(data=defenseyards, aes(x=reorder(Season, totalyards), weight=totalyards, fill=Type)) +
+  scale_y_continuous(name = "Total Yards", breaks = c(1000, 3000, 5000)) +
+  scale_fill_manual(name = "Yardage Type", labels = c("Passing Yards", "Rushing Yards"), values = c("#FB4F14", "#001489")) +
+  labs(
+    x="", 
+    y="Total Yards", 
+    title="Defense Wins Championships", 
+    subtitle="The 2015 and 1997 teams were the best at stopping opponents from moving down the field, while the 2013 \n team was not able stop opponents from racking up yards", 
+    caption="Source: Pro Football Reference | By Dylan Bayles"
+    ) +
+  theme_minimal() + 
+  theme(
+    plot.title = element_text(size = 20, face = "bold"),
+    axis.title = element_text(size = 8), 
+    plot.subtitle = element_text(size=10), 
+    panel.grid.minor = element_blank(),
+    plot.title.position = "plot"
+    ) 
+
+  
+```
+
+It's pretty apparent that without a defense, you're going to get ran over by 35 points in the Super Bowl, regardless of how amazing your offense is. For that reason, the 2013 team is out of contention. 
+
+With the three Super Bowl teams remaining, the victor is clear. Even though the 2015 team had a slight advantage on the 1997 team in terms of defense, the offensive prowess was simply not there for the 2015 team. With that, they're out.
+
+The 1998 team had a slightly better offense than the 1997 team based on the Z-scores, but weren't even above average for Denver teams in their defensive simple rating. 
+
+There's plenty of crowns to be given out for the best offensive and defensive Broncos teams, but at the end of the day it doesn't get you the best team award. You need to have a solid offense, a solid defense, and the best quarterback of all time and undisputed GOAT, better known as John Elway, to receive that award.
+
+As such, the 1997 team is the best Denver Broncos team of all time.
+
+
+
+
+The code for this post can be found [here](google.com).
+
+
+
+
+
+
+
+
+
