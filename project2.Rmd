@@ -1,0 +1,620 @@
+---
+title: Is Nebraska Softball The Best Team In The Big Ten?
+author: Dylan Bayles
+date: '2022-05-01'
+slug: is-nebraska-softball-the-best-team-in-the-big-ten
+categories: []
+tags: []
+---
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+knitr::opts_chunk$set(error = TRUE)
+
+```
+
+The Nebraska Softball team has had a long history of success, with six first-place finishes in 7 years in the Big Eight during the 1980s and 15 Regional appearances at minimum in the 16 years they spent in the Big 12. 
+
+However, since moving to the Big Ten in 2012, they've only made two Regionals, one Super Regional, and one College World Series. 
+
+The last three years have been less than ideal with two losing seasons (one cancelled halfway due to Covid-19) followed by a 0.500 season last year. 
+
+This year, however, they've had quite the electric season with a 35-13 overall record (15-4 in the Big Ten). They had an 18-game winning streak at one point and are looking like a top contender for upcoming the Big Ten Tournament.
+
+Northwestern has less conferences losses, and thus is ranked #1 in the Big Ten. But are they really the best team in the Big Ten? 
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+
+library(tidyverse)
+library(rvest)
+library(ggrepel)
+library(ggalt)
+library(gt)
+
+```
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+
+bigten <- c("Nebraska", "Northwestern", "Illinois", "Maryland", "Wisconsin", "Ohio St.", "Penn St.", "Michigan", "Indiana", "Minnesota", "Purdue", "Rutgers", "Michigan St.", "Iowa")
+
+```
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+
+url1 <- "https://www.ncaa.com/stats/softball/d1/current/team/281"
+
+battingavg1 <- url1 %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="block-bespin-content"]/div[4]/table') %>%
+  html_table()
+
+# html_table gives us a list of the table, so we look inside the list and save the table
+
+battingavg1 <- battingavg1[[1]]
+battingavg1 <- battingavg1 %>% 
+  mutate(
+  Rank = as.numeric(Rank)
+)
+
+url2 <- "https://www.ncaa.com/stats/softball/d1/current/team/281/p2"
+
+battingavg2 <- url2 %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="block-bespin-content"]/div[4]/table') %>%
+  html_table()
+
+battingavg2 <- battingavg2[[1]]
+battingavg2 <- battingavg2 %>% 
+  mutate(
+  Rank = as.numeric(Rank)
+)
+
+url3 <- "https://www.ncaa.com/stats/softball/d1/current/team/281/p3"
+
+battingavg3 <- url3 %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="block-bespin-content"]/div[4]/table') %>%
+  html_table()
+
+battingavg3 <- battingavg3[[1]]
+battingavg3 <- battingavg3 %>% 
+  mutate(
+  Rank = as.numeric(Rank)
+)
+
+
+url4 <- "https://www.ncaa.com/stats/softball/d1/current/team/281/p4"
+
+battingavg4 <- url4 %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="block-bespin-content"]/div[4]/table') %>%
+  html_table()
+
+battingavg4 <- battingavg4[[1]] %>%
+  mutate(Rank = as.numeric(gsub("-", "", Rank)))
+
+url5 <- "https://www.ncaa.com/stats/softball/d1/current/team/281/p5"
+
+battingavg5 <- url5 %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="block-bespin-content"]/div[4]/table') %>%
+  html_table()
+
+battingavg5 <- battingavg5[[1]]
+battingavg5 <- battingavg5 %>% 
+  mutate(
+  Rank = as.numeric(Rank)
+)
+
+url6 <- "https://www.ncaa.com/stats/softball/d1/current/team/281/p6"
+
+battingavg6 <- url6 %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="block-bespin-content"]/div[4]/table') %>%
+  html_table()
+
+battingavg6 <- battingavg6[[1]]
+battingavg6 <- battingavg6 %>% 
+  mutate(
+  Rank = as.numeric(Rank)
+)
+
+battingavg <- bind_rows(battingavg1, battingavg2, battingavg3, battingavg4, battingavg5, battingavg6)
+
+bigten <- c("Nebraska", "Northwestern", "Illinois", "Maryland", "Wisconsin", "Ohio State", "Penn State", "Michigan", "Indiana", "Minnesota", "Purdue", "Rutgers", "Michigan State", "Iowa")
+
+bigtenbattingavg <- battingavg %>% 
+  filter(Team %in% bigten)
+
+```
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+eraurl1 <- "https://www.ncaa.com/stats/softball/d1/current/team/282"
+era1 <- eraurl1 %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="block-bespin-content"]/div[4]/table') %>%
+  html_table()
+
+era1 <- era1[[1]]
+era1 <- era1 %>%
+  mutate(
+    Rank = as.numeric(Rank)
+  )
+
+
+eraurl2 <- "https://www.ncaa.com/stats/softball/d1/current/team/282/p2"
+era2 <- eraurl2 %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="block-bespin-content"]/div[4]/table') %>%
+  html_table()
+
+era2 <- era2[[1]]
+era2 <- era2 %>%
+  mutate(
+    Rank = as.numeric(Rank)
+  )
+
+
+eraurl3 <- "https://www.ncaa.com/stats/softball/d1/current/team/282/p3"
+era3 <- eraurl3 %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="block-bespin-content"]/div[4]/table') %>%
+  html_table()
+
+era3 <- era3[[1]]
+era3 <- era3 %>%
+  mutate(
+    Rank = as.numeric(Rank)
+  )
+
+
+eraurl4 <- "https://www.ncaa.com/stats/softball/d1/current/team/282/p4"
+era4 <- eraurl4 %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="block-bespin-content"]/div[4]/table') %>%
+  html_table()
+
+era4 <- era4[[1]]
+
+era4 <- era4 %>%
+  mutate(
+    Rank = as.numeric(Rank)
+  )
+
+eraurl5 <- "https://www.ncaa.com/stats/softball/d1/current/team/282/p5"
+era5 <- eraurl5 %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="block-bespin-content"]/div[4]/table') %>%
+  html_table()
+
+era5 <- era5[[1]]
+era5 <- era5 %>%
+  mutate(
+    Rank = as.numeric(Rank)
+  )
+
+eraurl6 <- "https://www.ncaa.com/stats/softball/d1/current/team/282/p6"
+era6 <- eraurl6 %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="block-bespin-content"]/div[4]/table') %>%
+  html_table()
+
+era6 <- era6[[1]]
+
+era6 <- era6 %>%
+  mutate(
+    Rank = as.numeric(Rank)
+  )
+
+era <- bind_rows(era1, era2, era3, era4, era5, era6)
+
+bigtenera <- era %>%
+  filter(Team %in% bigten)
+```
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+
+fieldingpercentageurl1 <- "https://www.ncaa.com/stats/softball/d1/current/team/283"
+fieldingpercentage1 <- fieldingpercentageurl1 %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="block-bespin-content"]/div[4]/table') %>%
+  html_table()
+
+fieldingpercentage1 <- fieldingpercentage1[[1]]
+fieldingpercentage1 <- fieldingpercentage1 %>%
+  mutate(
+    Rank = as.numeric(Rank)
+  )
+
+fieldingpercentageurl2 <- "https://www.ncaa.com/stats/softball/d1/current/team/283/p2"
+fieldingpercentage2 <- fieldingpercentageurl2 %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="block-bespin-content"]/div[4]/table') %>%
+  html_table()
+
+fieldingpercentage2 <- fieldingpercentage2[[1]]
+fieldingpercentage2 <- fieldingpercentage2 %>%
+  mutate(
+    Rank = as.numeric(Rank)
+  )
+
+fieldingpercentageurl3 <- "https://www.ncaa.com/stats/softball/d1/current/team/283/p3"
+fieldingpercentage3 <- fieldingpercentageurl3 %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="block-bespin-content"]/div[4]/table') %>%
+  html_table()
+
+fieldingpercentage3 <- fieldingpercentage3[[1]]
+fieldingpercentage3 <- fieldingpercentage3 %>%
+  mutate(
+    Rank = as.numeric(Rank)
+  )
+
+fieldingpercentageurl4 <- "https://www.ncaa.com/stats/softball/d1/current/team/283/p4"
+fieldingpercentage4 <- fieldingpercentageurl4 %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="block-bespin-content"]/div[4]/table') %>%
+  html_table()
+
+fieldingpercentage4 <- fieldingpercentage4[[1]]
+fieldingpercentage4 <- fieldingpercentage4 %>%
+  mutate(
+    Rank = as.numeric(Rank)
+  )
+
+fieldingpercentageurl5 <- "https://www.ncaa.com/stats/softball/d1/current/team/283/p5"
+fieldingpercentage5 <- fieldingpercentageurl5 %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="block-bespin-content"]/div[4]/table') %>%
+  html_table()
+
+fieldingpercentage5 <- fieldingpercentage5[[1]]
+fieldingpercentage5 <- fieldingpercentage5 %>%
+  mutate(
+    Rank = as.numeric(Rank)
+  )
+
+fieldingpercentageurl6 <- "https://www.ncaa.com/stats/softball/d1/current/team/283/p6"
+fieldingpercentage6 <- fieldingpercentageurl6 %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="block-bespin-content"]/div[4]/table') %>%
+  html_table()
+
+fieldingpercentage6 <- fieldingpercentage6[[1]]
+fieldingpercentage6 <- fieldingpercentage6 %>%
+  mutate(
+    Rank = as.numeric(Rank)
+  )
+
+fieldingpercentage <- bind_rows(fieldingpercentage1, fieldingpercentage2, fieldingpercentage3, fieldingpercentage4, fieldingpercentage5, fieldingpercentage6)
+
+bigtenfieldingpercentage <- fieldingpercentage %>%
+  filter(Team %in% bigten)
+
+```
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+onbasepercentageurl1 <- "https://www.ncaa.com/stats/softball/d1/current/team/862"
+onbasepercentage1 <- onbasepercentageurl1 %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="block-bespin-content"]/div[4]/table') %>%
+  html_table()
+
+onbasepercentage1 <- onbasepercentage1[[1]]
+onbasepercentage1 <- onbasepercentage1 %>%
+  mutate(
+    Rank = as.numeric(Rank)
+  )
+
+onbasepercentageurl2 <- "https://www.ncaa.com/stats/softball/d1/current/team/862/p2"
+onbasepercentage2 <- onbasepercentageurl2 %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="block-bespin-content"]/div[4]/table') %>%
+  html_table()
+
+onbasepercentage2 <- onbasepercentage2[[1]]
+onbasepercentage2 <- onbasepercentage2 %>%
+  mutate(
+    Rank = as.numeric(Rank)
+  )
+
+onbasepercentageurl3 <- "https://www.ncaa.com/stats/softball/d1/current/team/862/p3"
+onbasepercentage3 <- onbasepercentageurl3 %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="block-bespin-content"]/div[4]/table') %>%
+  html_table()
+
+onbasepercentage3 <- onbasepercentage3[[1]]
+onbasepercentage3 <- onbasepercentage3 %>%
+  mutate(
+    Rank = as.numeric(Rank)
+  )
+
+onbasepercentageurl4 <- "https://www.ncaa.com/stats/softball/d1/current/team/862/p4"
+onbasepercentage4 <- onbasepercentageurl4 %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="block-bespin-content"]/div[4]/table') %>%
+  html_table()
+
+onbasepercentage4 <- onbasepercentage4[[1]]
+onbasepercentage4 <- onbasepercentage4 %>%
+  mutate(
+    Rank = as.numeric(Rank)
+  )
+
+onbasepercentageurl5 <- "https://www.ncaa.com/stats/softball/d1/current/team/862/p5"
+onbasepercentage5 <- onbasepercentageurl1 %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="block-bespin-content"]/div[4]/table') %>%
+  html_table()
+
+onbasepercentage5 <- onbasepercentage5[[1]]
+onbasepercentage5 <- onbasepercentage5 %>%
+  mutate(
+    Rank = as.numeric(Rank)
+  )
+
+onbasepercentageurl6 <- "https://www.ncaa.com/stats/softball/d1/current/team/862/p6"
+onbasepercentage6 <- onbasepercentageurl6 %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="block-bespin-content"]/div[4]/table') %>%
+  html_table()
+
+onbasepercentage6 <- onbasepercentage6[[1]]
+onbasepercentage6 <- onbasepercentage6 %>%
+  mutate(
+    Rank = as.numeric(Rank)
+  )
+
+
+onbasepercentage <- bind_rows(onbasepercentage1, onbasepercentage2, onbasepercentage3, onbasepercentage4, onbasepercentage5, onbasepercentage6) %>% distinct()
+
+bigtenonbasepercentage <- onbasepercentage %>%
+  filter(Team %in% bigten)
+
+```
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+
+scoringpergameurl1 <- "https://www.ncaa.com/stats/softball/d1/current/team/284"
+scoringpergame1 <- scoringpergameurl1 %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="block-bespin-content"]/div[4]/table') %>%
+  html_table()
+
+scoringpergame1 <- scoringpergame1[[1]]
+scoringpergame1 <- scoringpergame1 %>%
+  mutate(
+    Rank = as.numeric(Rank)
+  )
+
+scoringpergameurl2 <- "https://www.ncaa.com/stats/softball/d1/current/team/284/p2"
+scoringpergame2 <- scoringpergameurl2 %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="block-bespin-content"]/div[4]/table') %>%
+  html_table()
+
+scoringpergame2 <- scoringpergame2[[1]]
+scoringpergame2 <- scoringpergame2 %>%
+  mutate(
+    Rank = as.numeric(Rank)
+  )
+
+scoringpergameurl3 <- "https://www.ncaa.com/stats/softball/d1/current/team/284/p3"
+scoringpergame3 <- scoringpergameurl3 %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="block-bespin-content"]/div[4]/table') %>%
+  html_table()
+
+scoringpergame3 <- scoringpergame3[[1]]
+scoringpergame3 <- scoringpergame3 %>%
+  mutate(
+    Rank = as.numeric(Rank)
+  )
+
+scoringpergameurl4 <- "https://www.ncaa.com/stats/softball/d1/current/team/284/p4"
+scoringpergame4 <- scoringpergameurl4 %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="block-bespin-content"]/div[4]/table') %>%
+  html_table()
+
+scoringpergame4 <- scoringpergame4[[1]]
+scoringpergame4 <- scoringpergame4 %>%
+  mutate(
+    Rank = as.numeric(Rank)
+  )
+
+scoringpergameurl5 <- "https://www.ncaa.com/stats/softball/d1/current/team/284/p5"
+scoringpergame5 <- scoringpergameurl5 %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="block-bespin-content"]/div[4]/table') %>%
+  html_table()
+
+scoringpergame5 <- scoringpergame5[[1]]
+scoringpergame5 <- scoringpergame5 %>%
+  mutate(
+    Rank = as.numeric(Rank)
+  )
+
+scoringpergameurl6 <- "https://www.ncaa.com/stats/softball/d1/current/team/284/p6"
+scoringpergame6 <- scoringpergameurl6 %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="block-bespin-content"]/div[4]/table') %>%
+  html_table()
+
+scoringpergame6 <- scoringpergame6[[1]]
+scoringpergame6 <- scoringpergame6 %>%
+  mutate(
+    Rank = as.numeric(Rank)
+  )
+
+scoringpergame <- bind_rows(scoringpergame1, scoringpergame2, scoringpergame3, scoringpergame4, scoringpergame5, scoringpergame6)
+
+bigtenscoringpergame <- scoringpergame %>%
+  filter(Team %in% bigten)
+
+```
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+
+allteamsdata <- read_csv("allteamsdata.csv")
+
+hits <- allteamsdata %>% 
+  filter(Team %in% bigten) %>%
+  mutate(
+    SingleHits = (H - `2B` - `3B` - HR),
+    DoubleHits = `2B`,
+    TripleHits = `3B`,
+    NonHomeRunHits = SingleHits + DoubleHits + TripleHits,
+    HomeRunHits = HR,
+    TotalHits = NonHomeRunHits + HomeRunHits
+  )
+
+longhits <- hits %>%
+  select(Team, NonHomeRunHits, HomeRunHits) %>% pivot_longer(cols = ends_with("Hits"), names_to = "Type", values_to = "hits")
+
+```
+
+First, we'll look at the hitting capabilities of all the of the Big Ten teams. 
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+
+ggplot() + 
+  geom_bar(data=longhits, aes(x=reorder(Team, hits), weight=hits, fill=Type)) +
+  scale_y_continuous(name = "Total Hits", breaks = c(0, 100, 200, 300, 400)) +
+  scale_fill_manual(name = "Hits", labels = c("Home Runs", "Singles, Doubles, Triples"), values = c("red", "blue")) + 
+  coord_flip() +
+  labs(
+    x="", 
+    y="Total Hits", 
+    title='The Huskers Said "Bye Bye Softball"', 
+    subtitle="Nebraska has more home runs and combined total hits than any other team in the Big Ten", 
+    caption="Source: NCAA Softball Statistics | By Dylan Bayles"
+    ) +
+  theme_minimal() + 
+  theme(
+    plot.title = element_text(size = 20, face = "bold"),
+    axis.title = element_text(size = 8), 
+    plot.subtitle = element_text(size=10), 
+    panel.grid.minor = element_blank(),
+    plot.title.position = "plot"
+    ) 
+
+```
+
+The only other team close in contention with Nebraska is Illinois, who has more combined singles, doubles, and triples than the Huskers. However, Nebraska's home run count is significantly higher and gives them a slight edge over Illinois and a large lead over every other team. 
+
+Northwestern is notably missing from the top of the pack, coming in fifth for total hits.
+
+But hits aren't the only offensive metric that can help us determine who's offense is the most capable of high production games. Next, we'll look to the batting average (total hits divided by at bats) and on-base percentage (how often a batter gets on base per plate appearance). 
+
+This will help us see who is hitting the ball the most and getting on base the most, scaled for how often they go up to bat.
+
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+
+offense <- onbasepercentage %>% inner_join(battingavg, by = c("Team" = "Team"))
+bigtenoffense <- offense %>%
+  filter(Team %in% bigten)
+nu <- bigtenoffense %>% 
+  filter(Team == "Nebraska")
+nw <- bigtenoffense %>%
+  filter(Team == "Northwestern")
+
+
+ggplot() +
+  geom_point(data=offense, aes(x = BA, y = PCT), color = "grey", cex = 4) +
+  geom_point(data = bigtenoffense, aes(x = BA, y = PCT), color = "blue", cex = 4) + 
+  geom_point(data = nu, aes(x=BA, y=PCT), color = "red", cex=4) +
+  geom_point(data = nw, aes(x=BA, y=PCT), color = "#4E2A84", cex=4) +
+  geom_text_repel(data = nu, aes(x=BA, y = PCT, label = Team)) + 
+  geom_text_repel(data = nw, aes(x=BA, y = PCT, label = Team)) + 
+  labs(
+    x="Batting Average", 
+    y="On-Base Percentage", 
+    title="Nebraska's Bats and Cleats Are Hot", 
+    subtitle="The Huskers lead the Big Ten in both batting average and on-base percentage and are among the best out of all softball teams", 
+    caption="Source: NCAA Softball Statistics | By Dylan Bayles"
+    ) +
+  theme_minimal() + 
+  theme(
+    plot.title = element_text(size = 20, face = "bold"),
+    axis.title = element_text(size = 8), 
+    plot.subtitle = element_text(size=10), 
+    panel.grid.minor = element_blank(),
+    plot.title.position = "plot"
+    ) 
+
+```
+
+Not only do the Huskers have a significantly higher batting average and on-base percentage than any other Big Ten team, but they also are among the top of the pack for all NCAA softball teams.
+
+The only way to win games is to score runs, and hitting the ball and getting on the bases definitely helps you achieve that goal.
+
+But what about the defense? You can't let the other team run around the diamond more than you do. Let's look at the fielding percentage (handling the batted or thrown ball correctly), the earned run average (how many runs, on average, the pitcher gives up), and double plays.
+
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+
+bigtendefense <- bigtenfieldingpercentage %>% inner_join(bigtenera, by = c("Team" = "Team")) %>% inner_join(hits, by = c("Team" = "Team")) %>% select(Team, PCT, ERA, DP)
+
+bigtendefense %>%
+  arrange(desc(PCT)) %>%
+  top_n(5, wt = PCT) %>%
+  gt() %>%
+  cols_label(
+    Team = "Team",
+    PCT = "Fielding Percentage",
+    ERA = "Earned Run Average",
+    DP = "Double Plays"
+  ) %>%
+  tab_header(
+    title = "Close To The Top, But Definitely Not The Best",
+    subtitle = "Nebraska is third for fielding percentage, fifth in ERA, and first for total double plays in the Big Ten"
+  ) %>%
+  tab_source_note(
+    source_note = md("Source: NCAA Softball Statistics | By Dylan Bayles")
+  ) %>%
+  tab_style(
+    style = cell_text(color = "black", weight = "bold", align = "left"),
+    locations = cells_title("title")
+  ) %>%
+  tab_style(
+    style = cell_text(color = "black", weight = "bold", align = "left"),
+    locations = cells_title("subtitle")
+  ) %>%
+  tab_style(
+    locations = cells_column_labels(columns = everything()),
+    style = list(
+      cell_borders(sides = "bottom", weight = px(3)),
+      cell_text(weight = "bold", size = 12)
+    )
+  ) %>%
+  opt_row_striping() %>%
+  opt_table_lines("none") %>% 
+  tab_style( 
+    style = list(
+      cell_fill(color = "#E41C38"),
+      cell_text(color = "white")
+    ),
+    locations = cells_body(
+      rows = Team == "Nebraska"
+    )) %>%
+    tab_style( 
+    style = list(
+      cell_fill(color = "#4E2A84"),
+      cell_text(color = "white")
+    ),
+    locations = cells_body(
+      rows = Team == "Northwestern" 
+    ))
+
+```
+
+They definitely aren't the best defense in the Big Ten, but they are right up there with the other top competitors. 
+
+Two weeks ago, we would've had conclusive evidence here to show that Nebraska is the best team in the Big Ten. However, both this past weekend and the one prior they fumbled and lost four conference games, dropping them to second place in the Big Ten standings. 
+
+They have yet to play No. 7 overall ranked Northwestern, which is their biggest threat to a Big Ten Tournament title. Nebraska Softball is definitely a contender, but not 100% the best team in the Big Ten.
+
+The code for this post can be found here.
+
